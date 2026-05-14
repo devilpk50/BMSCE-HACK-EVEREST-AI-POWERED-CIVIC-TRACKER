@@ -1,0 +1,32 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environment
+.venv/
+venv/
+
+# Local settings and secrets
+.env
+*.env
+config.ini
+secrets.yml
+secrets.yaml
+
+# Database files
+*.db
+*.sqlite3
+
+# Log files
+*.log
+
+# Uvicorn / ASGI
+*.pid
+
+# IDE / editor
+.vscode/
+.idea/
