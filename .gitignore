@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# IDE / Editor directories
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables and secrets
+.env
+.env.*
+*.env
+secrets.yaml
+secrets.yml
+credentials.json
+
+# Database files
+*.sqlite3
+*.db
+backend/sqlite_fallback.db
+backend/uploads/
+
+# Logs
+*.log
+
+# PyTorch / model cache
+cache/
+*.pt
+*.pth
+
+# Uvicorn / FastAPI
+*.pid
+
+# Ignore compiled C extensions
+*.so
+
+# Ignore node_modules if frontend added later
+node_modules/
