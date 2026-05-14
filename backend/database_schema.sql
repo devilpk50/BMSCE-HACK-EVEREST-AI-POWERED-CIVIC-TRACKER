@@ -1,4 +1,4 @@
--- Team Everest: Database Schema for Civic Tracker
+ -- Team Everest: Database Schema for Civic Tracker
 -- Lead: Prajesh L
 
 -- Enable PostGIS for spatial mapping
