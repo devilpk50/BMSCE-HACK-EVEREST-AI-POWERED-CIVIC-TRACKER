@@ -1,7 +1,11 @@
+import hashlib
+import os
+import sqlite3
 import psycopg2
 from psycopg2 import sql
 from typing import List, Dict, Optional, Tuple
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # Database configuration
@@ -13,7 +17,46 @@ DB_CONFIG = {
     "port": "5432"
 }
 
+DB_SQLITE_PATH = os.path.join(os.path.dirname(__file__), "sqlite_fallback.db")
+
 app = FastAPI(title="Civic Tracker API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:5501", "http://localhost:5501"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+def get_sqlite_connection():
+    conn = sqlite3.connect(DB_SQLITE_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_sqlite():
+    conn = get_sqlite_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS civic_reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            lat REAL,
+            lng REAL,
+            image_hash TEXT UNIQUE,
+            category TEXT,
+            severity INTEGER DEFAULT 1,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    conn.commit()
+    conn.close()
+
+
+init_sqlite()
 
 
 class ReportCreate(BaseModel):
@@ -39,6 +82,29 @@ def get_connection():
         return None
 
 
+def save_report_fallback(lat: float, lng: float, img_hash: str, category: str, severity: int = 1) -> bool:
+    """
+    Save report metadata to a local SQLite fallback when PostgreSQL is unavailable.
+    """
+    try:
+        conn = get_sqlite_connection()
+        cur = conn.cursor()
+        cur.execute(
+            """
+            INSERT OR IGNORE INTO civic_reports (lat, lng, image_hash, category, severity)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (lat, lng, img_hash, category, severity),
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"SQLite fallback save error: {e}")
+        return False
+
+
 def insert_report(lat: float, lng: float, img_hash: str, category: str, severity: int = 1) -> bool:
     """
     Insert a new civic report into the database.
@@ -56,7 +122,7 @@ def insert_report(lat: float, lng: float, img_hash: str, category: str, severity
     try:
         conn = get_connection()
         if not conn:
-            return False
+            return save_report_fallback(lat, lng, img_hash, category, severity)
         
         cur = conn.cursor()
         
@@ -78,7 +144,7 @@ def insert_report(lat: float, lng: float, img_hash: str, category: str, severity
     
     except Exception as e:
         print(f"Database error: {e}")
-        return False
+        return save_report_fallback(lat, lng, img_hash, category, severity)
 
 
 def get_reports_by_category(category: str) -> List[Dict]:
@@ -91,31 +157,45 @@ def get_reports_by_category(category: str) -> List[Dict]:
     Returns:
         List[Dict]: List of reports matching the category
     """
+    conn = get_connection()
+    if conn:
+        try:
+            cur = conn.cursor()
+            query = """
+            SELECT id, ST_X(location::geometry) as lat, ST_Y(location::geometry) as lng, 
+                   image_hash, category, severity, created_at
+            FROM civic_reports
+            WHERE category = %s
+            ORDER BY created_at DESC;
+            """
+            cur.execute(query, (category,))
+            columns = [desc[0] for desc in cur.description]
+            reports = [dict(zip(columns, row)) for row in cur.fetchall()]
+            cur.close()
+            conn.close()
+            return reports
+        except Exception as e:
+            print(f"Database error: {e}")
+            conn.close()
+    
     try:
-        conn = get_connection()
-        if not conn:
-            return []
-        
+        conn = get_sqlite_connection()
         cur = conn.cursor()
-        query = """
-        SELECT id, ST_X(location::geometry) as lat, ST_Y(location::geometry) as lng, 
-               image_hash, category, severity, created_at
-        FROM civic_reports
-        WHERE category = %s
-        ORDER BY created_at DESC;
-        """
-        
-        cur.execute(query, (category,))
-        columns = [desc[0] for desc in cur.description]
-        reports = [dict(zip(columns, row)) for row in cur.fetchall()]
-        
+        cur.execute(
+            """
+            SELECT id, lat as lat, lng as lng, image_hash, category, severity, created_at
+            FROM civic_reports
+            WHERE category = ?
+            ORDER BY created_at DESC;
+            """,
+            (category,)
+        )
+        reports = [dict(row) for row in cur.fetchall()]
         cur.close()
         conn.close()
-        
         return reports
-    
     except Exception as e:
-        print(f"Database error: {e}")
+        print(f"SQLite error: {e}")
         return []
 
 
@@ -170,32 +250,45 @@ def get_report_by_id(report_id: int) -> Optional[Dict]:
     Returns:
         Dict: Report data or None if not found
     """
-    try:
-        conn = get_connection()
-        if not conn:
+    conn = get_connection()
+    if conn:
+        try:
+            cur = conn.cursor()
+            query = """
+            SELECT id, ST_X(location::geometry) as lat, ST_Y(location::geometry) as lng, 
+                   image_hash, category, severity, created_at
+            FROM civic_reports
+            WHERE id = %s;
+            """
+            cur.execute(query, (report_id,))
+            row = cur.fetchone()
+            cur.close()
+            conn.close()
+            if row:
+                columns = [desc[0] for desc in cur.description]
+                return dict(zip(columns, row))
             return None
-        
+        except Exception as e:
+            print(f"Database error: {e}")
+            conn.close()
+    
+    try:
+        conn = get_sqlite_connection()
         cur = conn.cursor()
-        query = """
-        SELECT id, ST_X(location::geometry) as lat, ST_Y(location::geometry) as lng, 
-               image_hash, category, severity, created_at
-        FROM civic_reports
-        WHERE id = %s;
-        """
-        
-        cur.execute(query, (report_id,))
+        cur.execute(
+            """
+            SELECT id, lat as lat, lng as lng, image_hash, category, severity, created_at
+            FROM civic_reports
+            WHERE id = ?;
+            """,
+            (report_id,)
+        )
         row = cur.fetchone()
-        
         cur.close()
         conn.close()
-        
-        if row:
-            columns = [desc[0] for desc in cur.description]
-            return dict(zip(columns, row))
-        return None
-    
+        return dict(row) if row else None
     except Exception as e:
-        print(f"Database error: {e}")
+        print(f"SQLite error: {e}")
         return None
 
 
@@ -273,30 +366,42 @@ def get_all_reports() -> List[Dict]:
     Returns:
         List[Dict]: List of all reports
     """
+    conn = get_connection()
+    if conn:
+        try:
+            cur = conn.cursor()
+            query = """
+            SELECT id, ST_X(location::geometry) as lat, ST_Y(location::geometry) as lng, 
+                   image_hash, category, severity, created_at
+            FROM civic_reports
+            ORDER BY created_at DESC;
+            """
+            cur.execute(query)
+            columns = [desc[0] for desc in cur.description]
+            reports = [dict(zip(columns, row)) for row in cur.fetchall()]
+            cur.close()
+            conn.close()
+            return reports
+        except Exception as e:
+            print(f"Database error: {e}")
+            conn.close()
+    
     try:
-        conn = get_connection()
-        if not conn:
-            return []
-        
+        conn = get_sqlite_connection()
         cur = conn.cursor()
-        query = """
-        SELECT id, ST_X(location::geometry) as lat, ST_Y(location::geometry) as lng, 
-               image_hash, category, severity, created_at
-        FROM civic_reports
-        ORDER BY created_at DESC;
-        """
-        
-        cur.execute(query)
-        columns = [desc[0] for desc in cur.description]
-        reports = [dict(zip(columns, row)) for row in cur.fetchall()]
-        
+        cur.execute(
+            """
+            SELECT id, lat as lat, lng as lng, image_hash, category, severity, created_at
+            FROM civic_reports
+            ORDER BY created_at DESC;
+            """
+        )
+        reports = [dict(row) for row in cur.fetchall()]
         cur.close()
         conn.close()
-        
         return reports
-    
     except Exception as e:
-        print(f"Database error: {e}")
+        print(f"SQLite error: {e}")
         return []
 
 
@@ -353,6 +458,49 @@ def get_report_statistics() -> Dict:
 @app.get("/")
 def read_root():
     return {"message": "Civic Tracker API"}
+
+
+@app.post("/upload")
+async def upload_report(
+    name: str = Form(...),
+    description: str = Form(...),
+    latitude: float = Form(...),
+    longitude: float = Form(...),
+    image: UploadFile = File(...),
+):
+    uploads_dir = os.path.join(os.path.dirname(__file__), "uploads")
+    os.makedirs(uploads_dir, exist_ok=True)
+    file_path = os.path.join(uploads_dir, image.filename)
+
+    image_bytes = await image.read()
+    with open(file_path, "wb") as f:
+        f.write(image_bytes)
+
+    img_hash = hashlib.md5(image_bytes).hexdigest()
+    category = description or "reported_issue"
+
+    success = insert_report(latitude, longitude, img_hash, category, severity=1)
+    if not success:
+        fallback_saved = save_report_fallback(latitude, longitude, img_hash, category, severity=1)
+        if not fallback_saved:
+            raise HTTPException(status_code=500, detail="Failed to save report to database or fallback storage")
+        print(f"DB unavailable, saved fallback record for {img_hash}")
+        return {
+            "message": "Upload received successfully (saved to local fallback)",
+            "saved_file": file_path,
+            "image_hash": img_hash,
+            "category": category,
+            "fallback": True,
+        }
+
+    print(f"Received upload: {name}, {description}, {latitude}, {longitude}, saved {file_path}")
+
+    return {
+        "message": "Upload received successfully",
+        "saved_file": file_path,
+        "image_hash": img_hash,
+        "category": category,
+    }
 
 
 @app.post("/reports")
