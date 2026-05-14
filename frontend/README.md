@@ -1,1 +1,1 @@
-# Team Everest Frontend - Leaflet & UI
+# garbage-detection
