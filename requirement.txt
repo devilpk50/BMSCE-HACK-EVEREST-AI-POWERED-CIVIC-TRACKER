@@ -1,6 +1,0 @@
-fastapi
-uvicorn
-ultralytics
-psycopg2-binary
-imagehash
-python-multipart
