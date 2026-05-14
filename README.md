@@ -1,6 +1,4 @@
 # BMSCE-HACK-EVEREST-AI-POWERED-CIVIC-TRACKER
-# BMSCE-HACK-TEAM-[Your_Team_Name]-CivicTracker
-
 ## 📌 Project Overview
 **Theme:** Theme B: AI-Powered Civic Tracker  
 **Goal:** A web-based heatmap platform that uses AI to detect potholes/garbage and PostGIS to prevent duplicate reporting.
