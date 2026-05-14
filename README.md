@@ -28,5 +28,7 @@
 
 ## ⚙️ Installation & Setup
 1. Clone the repo: `git clone [URL]`
-2. Install Python deps: `pip install -r requirements.txt`
-3. Run the backend: `python app.py`
+2. Install Python deps: `python -m pip install -r requirements.txt`
+3. Run the backend with Uvicorn: `python -m uvicorn backend.main:app --reload`
+
+> Note: `backend/main.py` now exposes a FastAPI app object at `app` so Uvicorn can load it correctly.
