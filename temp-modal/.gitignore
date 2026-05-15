@@ -1,0 +1,9 @@
+# .gitignore
+venv/
+dataset/
+runs/
+*.db
+__pycache__/
+.DS_Store
+test.jpg
+temp_*.jpg
