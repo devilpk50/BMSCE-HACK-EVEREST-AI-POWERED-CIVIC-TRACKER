@@ -51,6 +51,126 @@
             display: flex;
             gap: 10px;
         }
+    </style>
+</head>
+
+<body>
+
+<div class="title">
+    Smart Waste Management - Bengaluru
+</div>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Heatmap Plugin -->
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+<script>
+
+    // CREATE MAP
+ 
+
+    const map = L.map('map').setView([12.9716, 77.5946], 12);
+
+    // TILE LAYER
+
+
+    L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    {
+        attribution: '&copy; OpenStreetMap & CartoDB',
+        subdomains: 'abcd',
+        maxZoom: 20
+    }
+    ).addTo(map);
+
+    // DUMMY REPORT DATA
+
+    const reports = [
+
+       {
+        lat:12.9716,
+        lng:77.5946,
+        intensity:1
+    },
+
+    {
+        lat:12.9352,
+        lng:77.6245,
+        intensity:0.6
+    },
+
+    {
+        lat:12.9980,
+        lng:77.6762,
+        intensity:0.3
+    },
+
+    {
+        lat:12.9279,
+        lng:77.6271,
+        intensity:0.8
+    }
+
+    ];
+
+
+    // MARKERS
+
+
+    reports.forEach(report => {
+
+        L.marker([report.lat, report.lng])
+
+        .addTo(map)
+
+        .bindPopup("Waste Report");
+
+    });
+
+
+
+// HEATMAP POINTS
+
+
+const heatPoints = reports.map(r => [
+    r.lat,
+    r.lng,
+    r.intensity
+]);
+
+
+// CREATE HEATMAP
+
+
+const heat = L.heatLayer(heatPoints, {
+
+    radius: 35,
+    blur: 25,
+    maxZoom: 17,
+
+    gradient: {
+
+        0.2: 'green',
+        0.5: 'yellow',
+        0.8: 'orange',
+        1.0: 'red'
+
+    }
+
+}).addTo(map);
+    // REFRESH HEATMAP FROM API
+
+    async function refreshHeatmap() {
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:8000/get-locations"
+            );
 
         .nav-links a {
             color: var(--muted);
@@ -117,6 +237,8 @@
                 width: 100%;
                 overflow-x: auto;
             }
+    // AUTO REFRESH EVERY 10 SEC
+
 
             .map-panel {
                 top: 136px;

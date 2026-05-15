@@ -1,0 +1,8 @@
+# data.yaml
+path: /mnt/z/Softwares/wsl/Ubuntu_Distro/civic_model_project/dataset
+train: train/images
+val: val/images
+
+# We only have one class: 'trash'
+names:
+  0: trash
