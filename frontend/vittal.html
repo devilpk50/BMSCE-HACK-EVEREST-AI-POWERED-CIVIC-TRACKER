@@ -54,15 +54,13 @@
 
 <script>
 
-    // =========================
     // CREATE MAP
-    // =========================
+ 
 
     const map = L.map('map').setView([12.9716, 77.5946], 12);
 
-    // =========================
     // TILE LAYER
-    // =========================
+
 
     L.tileLayer(
     'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
@@ -73,41 +71,39 @@
     }
     ).addTo(map);
 
-    // =========================
     // DUMMY REPORT DATA
-    // =========================
 
     const reports = [
 
-        {
-            lat:12.9716,
-            lng:77.5946,
-            intensity:1
-        },
+       {
+        lat:12.9716,
+        lng:77.5946,
+        intensity:1
+    },
 
-        {
-            lat:12.9352,
-            lng:77.6245,
-            intensity:0.8
-        },
+    {
+        lat:12.9352,
+        lng:77.6245,
+        intensity:0.6
+    },
 
-        {
-            lat:12.9980,
-            lng:77.6762,
-            intensity:0.9
-        },
+    {
+        lat:12.9980,
+        lng:77.6762,
+        intensity:0.3
+    },
 
-        {
-            lat:12.9279,
-            lng:77.6271,
-            intensity:0.7
-        }
+    {
+        lat:12.9279,
+        lng:77.6271,
+        intensity:0.8
+    }
 
     ];
 
-    // =========================
+
     // MARKERS
-    // =========================
+
 
     reports.forEach(report => {
 
@@ -119,37 +115,38 @@
 
     });
 
-    // =========================
-    // HEATMAP POINTS
-    // =========================
 
-    const heatPoints = reports.map(r => [
-        r.lat,
-        r.lng,
-        r.intensity
-    ]);
 
-    // =========================
-    // CREATE HEATMAP
-    // =========================
+// HEATMAP POINTS
 
-    const heat = L.heatLayer(heatPoints, {
 
-        radius: 25,
-        blur: 15,
-        maxZoom: 17,
+const heatPoints = reports.map(r => [
+    r.lat,
+    r.lng,
+    r.intensity
+]);
 
-        gradient: {
-            0.4: 'blue',
-            0.65: 'lime',
-            1: 'red'
-        }
 
-    }).addTo(map);
+// CREATE HEATMAP
 
-    // =========================
+
+const heat = L.heatLayer(heatPoints, {
+
+    radius: 35,
+    blur: 25,
+    maxZoom: 17,
+
+    gradient: {
+
+        0.2: 'green',
+        0.5: 'yellow',
+        0.8: 'orange',
+        1.0: 'red'
+
+    }
+
+}).addTo(map);
     // REFRESH HEATMAP FROM API
-    // =========================
 
     async function refreshHeatmap() {
 
@@ -176,9 +173,8 @@
 
     }
 
-    // =========================
     // AUTO REFRESH EVERY 10 SEC
-    // =========================
+
 
     setInterval(refreshHeatmap, 10000);
 
