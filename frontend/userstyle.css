@@ -1,13 +1,26 @@
+:root {
+    --brand: #0f766e;
+    --brand-dark: #115e59;
+    --accent: #f59e0b;
+    --ink: #17202a;
+    --muted: #64748b;
+    --line: #d7e2ea;
+}
+
 body {
-    background-color: #f4f7fb;
+    background-color: #eef4f8;
     font-family: "Segoe UI", sans-serif;
-    color: #333;
+    color: var(--ink);
+}
+
+[hidden] {
+    display: none !important;
 }
 
 /* NAVBAR */
 
 .custom-navbar {
-    background: linear-gradient(90deg, #0b3d91, #1456c5);
+    background: linear-gradient(90deg, var(--brand-dark), var(--brand));
     padding: 14px 0;
 }
 
@@ -22,20 +35,23 @@ body {
 }
 
 .nav-link:hover {
-    color: #ffd54f !important;
+    color: #fde68a !important;
 }
 
 /* HERO */
 
 .hero-section {
-    padding: 70px 0;
-    background: white;
+    padding: 70px 0 58px;
+    background:
+        linear-gradient(135deg, rgba(15, 118, 110, 0.13), rgba(245, 158, 11, 0.12)),
+        #ffffff;
+    border-bottom: 1px solid var(--line);
 }
 
 .hero-title {
     font-size: 3rem;
     font-weight: 700;
-    color: #0b3d91;
+    color: var(--brand-dark);
 }
 
 .hero-text {
@@ -51,8 +67,8 @@ body {
 /* CARDS */
 
 .dashboard-card {
-    border: none;
-    border-radius: 18px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
     transition: 0.3s;
     background: white;
 }
@@ -93,15 +109,15 @@ body {
 
 .section-title h2 {
     font-weight: 700;
-    color: #0b3d91;
+    color: var(--brand-dark);
     margin-bottom: 25px;
 }
 
 .achievement-card {
-    background: linear-gradient(135deg, #1456c5, #0b3d91);
+    background: linear-gradient(135deg, var(--brand), var(--brand-dark));
     color: white;
     padding: 30px;
-    border-radius: 18px;
+    border-radius: 8px;
     text-align: center;
     transition: 0.3s;
 }
@@ -119,12 +135,12 @@ body {
 
 .leaderboard-table {
     background: white;
-    border-radius: 15px;
+    border-radius: 8px;
     overflow: hidden;
 }
 
 .leaderboard-table thead {
-    background: #0b3d91;
+    background: var(--brand-dark);
     color: white;
 }
 
@@ -137,10 +153,21 @@ body {
 /* FOOTER */
 
 .footer-section {
-    background: #0b3d91;
+    background: var(--brand-dark);
     color: white;
     padding: 20px;
     margin-top: 60px;
+}
+
+.btn-primary {
+    background: var(--brand);
+    border-color: var(--brand);
+    font-weight: 700;
+}
+
+.btn-primary:hover {
+    background: var(--brand-dark);
+    border-color: var(--brand-dark);
 }
 
 /* RESPONSIVE */

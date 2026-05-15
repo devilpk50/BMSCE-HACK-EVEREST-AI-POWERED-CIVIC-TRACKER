@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | CivicAI Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body data-auth-page="true">
+    <nav class="app-nav">
+        <a class="brand" href="user.html">CivicAI Tracker</a>
+        <div class="nav-links">
+            <a href="user.html">Dashboard</a>
+            <a href="index.html">Report Issue</a>
+            <a href="vittal.html">Live Map</a>
+            <a class="active" href="login.html">Login</a>
+            <a href="register.html">Register</a>
+        </div>
+    </nav>
+
+    <main class="auth-shell">
+        <section class="auth-copy">
+            <p class="eyebrow">Citizen access</p>
+            <h1>Login to continue tracking civic impact</h1>
+            <p>View your reports, keep your reward streak active, and submit verified civic issues faster.</p>
+        </section>
+
+        <section class="form-panel auth-card">
+            <form id="loginForm">
+                <h2>Welcome back</h2>
+
+                <label for="email">Email address</label>
+                <input type="email" id="email" placeholder="you@example.com" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password" required>
+
+                <button type="submit">Login</button>
+                <p class="helper-text">New citizen? <a href="register.html">Create an account</a></p>
+            </form>
+        </section>
+    </main>
+
+    <script src="auth.js?v=2"></script>
+    <script src="session.js?v=2"></script>
+</body>
+</html>

@@ -3,186 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Waste Management Map</title>
-
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet"
-    href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
+    <title>Live Map | CivicAI Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
     <style>
+        :root {
+            --brand: #0f766e;
+            --brand-dark: #115e59;
+            --muted: #64748b;
+            --line: #d7e2ea;
+        }
 
-        body{
-            margin:0;
-            padding:0;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
             font-family: Arial, sans-serif;
+            color: #17202a;
+            background: #eef4f8;
         }
 
-        #map{
-            height:100vh;
-            width:100%;
+        .app-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 14px clamp(18px, 4vw, 48px);
+            background: rgba(255, 255, 255, 0.94);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(12px);
         }
 
-        .title{
-            position:absolute;
-            top:10px;
-            left:50px;
-            z-index:1000;
-            background:white;
-            padding:10px 20px;
-            border-radius:10px;
-            font-size:20px;
-            font-weight:bold;
-            box-shadow:0 0 10px rgba(0,0,0,0.3);
+        .brand {
+            color: var(--brand-dark);
+            font-size: 20px;
+            font-weight: 800;
+            text-decoration: none;
         }
 
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .nav-links a:hover,
+        .nav-links .active {
+            color: var(--brand-dark);
+            background: #dff3ef;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+
+        .map-panel {
+            position: absolute;
+            top: 86px;
+            left: 24px;
+            z-index: 900;
+            width: min(360px, calc(100% - 48px));
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+        }
+
+        .map-panel h1 {
+            margin: 0 0 8px;
+            font-size: 22px;
+            color: var(--brand-dark);
+        }
+
+        .map-panel p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .status-pill {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            background: #dff3ef;
+            color: var(--brand-dark);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        @media (max-width: 720px) {
+            .app-nav {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .nav-links {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .map-panel {
+                top: 136px;
+            }
+        }
     </style>
 </head>
-
 <body>
+    <nav class="app-nav">
+        <a class="brand" href="user.html">CivicAI Tracker</a>
+        <div class="nav-links">
+            <a href="user.html">Dashboard</a>
+            <a href="index.html">Report Issue</a>
+            <a class="active" href="vittal.html">Live Map</a>
+            <a href="login.html" data-guest-only hidden>Login</a>
+            <a href="register.html" data-guest-only hidden>Register</a>
+            <a href="#" data-auth-only data-logout hidden>Logout</a>
+        </div>
+    </nav>
 
-<div class="title">
-    Smart Waste Management - Bengaluru
-</div>
+    <div class="map-panel">
+        <h1>Smart Waste Map</h1>
+        <p>Live civic reports around Bengaluru with severity-based heat intensity.</p>
+        <span class="status-pill" id="mapStatus">Loading reports...</span>
+    </div>
 
-<div id="map"></div>
+    <div id="map"></div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
-<!-- Heatmap Plugin -->
-<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+    <script>
+        const map = L.map("map").setView([12.9716, 77.5946], 12);
+        const statusPill = document.getElementById("mapStatus");
 
-<script>
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+            attribution: "&copy; OpenStreetMap & CartoDB",
+            subdomains: "abcd",
+            maxZoom: 20
+        }).addTo(map);
 
-    // =========================
-    // CREATE MAP
-    // =========================
+        const fallbackReports = [
+            { lat: 12.9716, lng: 77.5946, severity: 3, category: "Garbage" },
+            { lat: 12.9352, lng: 77.6245, severity: 2, category: "Pothole" },
+            { lat: 12.9980, lng: 77.6762, severity: 3, category: "Waste" },
+            { lat: 12.9279, lng: 77.6271, severity: 1, category: "Drainage" }
+        ];
 
-    const map = L.map('map').setView([12.9716, 77.5946], 12);
+        let markers = [];
+        const heat = L.heatLayer([], {
+            radius: 28,
+            blur: 18,
+            maxZoom: 17,
+            gradient: {
+                0.35: "#38bdf8",
+                0.65: "#facc15",
+                1: "#ef4444"
+            }
+        }).addTo(map);
 
-    // =========================
-    // TILE LAYER
-    // =========================
+        function renderReports(reports) {
+            markers.forEach(marker => marker.remove());
+            markers = [];
 
-    L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    {
-        attribution: '&copy; OpenStreetMap & CartoDB',
-        subdomains: 'abcd',
-        maxZoom: 20
-    }
-    ).addTo(map);
+            const heatPoints = reports.map(report => {
+                const severity = Number(report.severity || report.intensity || 1);
+                return [Number(report.lat), Number(report.lng), Math.min(severity / 3, 1)];
+            });
 
-    // =========================
-    // DUMMY REPORT DATA
-    // =========================
+            reports.forEach(report => {
+                const marker = L.marker([Number(report.lat), Number(report.lng)])
+                    .addTo(map)
+                    .bindPopup(`${report.category || "Civic issue"}<br>Severity: ${report.severity || 1}`);
+                markers.push(marker);
+            });
 
-    const reports = [
-
-        {
-            lat:12.9716,
-            lng:77.5946,
-            intensity:1
-        },
-
-        {
-            lat:12.9352,
-            lng:77.6245,
-            intensity:0.8
-        },
-
-        {
-            lat:12.9980,
-            lng:77.6762,
-            intensity:0.9
-        },
-
-        {
-            lat:12.9279,
-            lng:77.6271,
-            intensity:0.7
+            heat.setLatLngs(heatPoints);
         }
 
-    ];
+        async function refreshHeatmap() {
+            try {
+                const response = await fetch("http://127.0.0.1:8010/reports");
+                if (!response.ok) {
+                    throw new Error("Backend unavailable");
+                }
 
-    // =========================
-    // MARKERS
-    // =========================
-
-    reports.forEach(report => {
-
-        L.marker([report.lat, report.lng])
-
-        .addTo(map)
-
-        .bindPopup("Waste Report");
-
-    });
-
-    // =========================
-    // HEATMAP POINTS
-    // =========================
-
-    const heatPoints = reports.map(r => [
-        r.lat,
-        r.lng,
-        r.intensity
-    ]);
-
-    // =========================
-    // CREATE HEATMAP
-    // =========================
-
-    const heat = L.heatLayer(heatPoints, {
-
-        radius: 25,
-        blur: 15,
-        maxZoom: 17,
-
-        gradient: {
-            0.4: 'blue',
-            0.65: 'lime',
-            1: 'red'
+                const reports = await response.json();
+                renderReports(Array.isArray(reports) && reports.length ? reports : fallbackReports);
+                statusPill.textContent = `Showing ${Array.isArray(reports) ? reports.length : 0} live reports`;
+            } catch (error) {
+                renderReports(fallbackReports);
+                statusPill.textContent = "Demo data shown";
+                console.log("API Error:", error);
+            }
         }
 
-    }).addTo(map);
-
-    // =========================
-    // REFRESH HEATMAP FROM API
-    // =========================
-
-    async function refreshHeatmap() {
-
-        try {
-
-            const response = await fetch(
-                "http://localhost:8000/get-locations"
-            );
-
-            const data = await response.json();
-
-            // Update heatmap
-            heat.setLatLngs(data);
-
-            console.log("Heatmap Updated");
-
-        }
-
-        catch(error) {
-
-            console.log("API Error:", error);
-
-        }
-
-    }
-
-    // =========================
-    // AUTO REFRESH EVERY 10 SEC
-    // =========================
-
-    setInterval(refreshHeatmap, 10000);
-
-</script>
-
+        refreshHeatmap();
+        setInterval(refreshHeatmap, 10000);
+    </script>
+    <script src="session.js?v=2"></script>
 </body>
 </html>

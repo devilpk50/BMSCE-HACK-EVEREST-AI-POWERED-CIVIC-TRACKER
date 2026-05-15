@@ -3,6 +3,13 @@
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("submissionForm");
     const submitBtn = form.querySelector("button[type='submit']");
+    const token = localStorage.getItem("civicAuthToken");
+
+    if (!token) {
+        alert("Please login before submitting a report.");
+        window.location.href = "login.html";
+        return;
+    }
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -11,9 +18,21 @@ document.addEventListener("DOMContentLoaded", () => {
         submitBtn.disabled = true;
         submitBtn.innerText = "Analyzing with AI...";
 
-        const name = document.getElementById("name").value;
-        const description = document.getElementById("description").value;
+        const name = document.getElementById("name").value.trim();
+        const description = document.getElementById("description").value.trim();
         const imageInput = document.getElementById("image");
+
+        if (name.length < 2) {
+            alert("Name must be at least 2 characters.");
+            resetButton();
+            return;
+        }
+
+        if (description.length < 10) {
+            alert("Description must be at least 10 characters.");
+            resetButton();
+            return;
+        }
 
         if (imageInput.files.length === 0) {
             alert("Please select an image.");
@@ -22,6 +41,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const imageFile = imageInput.files[0];
+
+        if (!imageFile.type.startsWith("image/")) {
+            alert("Please upload a valid image file.");
+            resetButton();
+            return;
+        }
+
+        if (imageFile.size > 5 * 1024 * 1024) {
+            alert("Image must be smaller than 5 MB.");
+            resetButton();
+            return;
+        }
 
         if (!navigator.geolocation) {
             alert("Geolocation is not supported.");
@@ -39,8 +70,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 formData.append("image", imageFile);
 
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/upload", {
+                    const response = await fetch("http://127.0.0.1:8010/upload", {
                         method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        },
                         body: formData
                     });
 

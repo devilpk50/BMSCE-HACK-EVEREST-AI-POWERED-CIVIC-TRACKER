@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | CivicAI Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body data-auth-page="true">
+    <nav class="app-nav">
+        <a class="brand" href="user.html">CivicAI Tracker</a>
+        <div class="nav-links">
+            <a href="user.html">Dashboard</a>
+            <a href="index.html">Report Issue</a>
+            <a href="vittal.html">Live Map</a>
+            <a href="login.html">Login</a>
+            <a class="active" href="register.html">Register</a>
+        </div>
+    </nav>
+
+    <main class="auth-shell">
+        <section class="auth-copy">
+            <p class="eyebrow">Join the network</p>
+            <h1>Create your citizen account</h1>
+            <p>Register to report issues, collect reward points, and help teams identify high-priority zones.</p>
+        </section>
+
+        <section class="form-panel auth-card">
+            <form id="registerForm">
+                <h2>Register</h2>
+
+                <label for="fullName">Full name</label>
+                <input type="text" id="fullName" placeholder="Enter full name" required>
+
+                <label for="email">Email address</label>
+                <input type="email" id="email" placeholder="you@example.com" required>
+
+                <label for="phone">Phone number</label>
+                <input type="tel" id="phone" placeholder="Enter phone number" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Create password" minlength="6" required>
+
+                <label for="confirmPassword">Confirm password</label>
+                <input type="password" id="confirmPassword" placeholder="Re-enter password" minlength="6" required>
+
+                <button type="submit">Create Account</button>
+                <p class="helper-text">Already registered? <a href="login.html">Login here</a></p>
+            </form>
+        </section>
+    </main>
+
+    <script src="auth.js?v=2"></script>
+    <script src="session.js?v=2"></script>
+</body>
+</html>

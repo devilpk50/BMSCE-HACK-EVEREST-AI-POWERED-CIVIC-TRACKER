@@ -1,27 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Garbage Detection Form</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Issue | CivicAI Tracker</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body data-protected="true">
+    <nav class="app-nav">
+        <a class="brand" href="user.html">CivicAI Tracker</a>
+        <div class="nav-links">
+            <a href="user.html">Dashboard</a>
+            <a class="active" href="index.html">Report Issue</a>
+            <a href="vittal.html">Live Map</a>
+            <a href="login.html" data-guest-only hidden>Login</a>
+            <a href="register.html" data-guest-only hidden>Register</a>
+            <a href="#" data-auth-only data-logout hidden>Logout</a>
+        </div>
+    </nav>
 
-<h2>Submission Form</h2>
+    <main class="page-shell">
+        <section class="intro-panel">
+            <p class="eyebrow">Citizen report</p>
+            <h1>Submit a civic issue for AI validation</h1>
+            <p>
+                Upload a clear photo, add a short description, and your current location will be attached automatically.
+            </p>
+        </section>
 
-<form id="submissionForm">
-    <input type="text" id="name" placeholder="Enter name" required>
-    <br><br>
+        <section class="form-panel">
+            <form id="submissionForm">
+                <label for="name">Your name</label>
+                <input type="text" id="name" placeholder="Enter name" required>
 
-    <textarea id="description" placeholder="Enter description"></textarea>
-    <br><br>
+                <label for="description">Issue description</label>
+                <textarea id="description" placeholder="Garbage dump near bus stop, pothole on main road..." rows="5"></textarea>
 
-    <input type="file" id="image" accept="image/*" required>
-    <br><br>
+                <label for="image">Issue photo</label>
+                <input type="file" id="image" accept="image/*" required>
 
-    <button type="submit">Submit</button>
-</form>
+                <button type="submit">Submit Report</button>
+                <p class="helper-text">Location permission is required when you submit.</p>
+            </form>
+        </section>
+    </main>
 
-<script src="h1.js"></script>
-
+    <script src="session.js?v=2"></script>
+    <script src="h1.js"></script>
 </body>
 </html>
