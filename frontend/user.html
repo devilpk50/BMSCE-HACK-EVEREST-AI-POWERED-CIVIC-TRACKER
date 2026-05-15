@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Civic Tracker Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark custom-navbar shadow">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-shield-check"></i>
+                CivicAI Tracker
+            </a>
+
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Dashboard</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Report Issue</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Leaderboard</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Rewards</a>
+                    </li>
+
+                    <li class="nav-item ms-3">
+                        <button class="btn btn-warning fw-semibold">
+                            <i class="bi bi-person-circle"></i> Citizen
+                        </button>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+
+                <div class="col-lg-7">
+                    <h1 class="hero-title">
+                        Smart Civic Issue Monitoring System
+                    </h1>
+
+                    <p class="hero-text">
+                        Report potholes, garbage dumps, and civic issues using AI-powered detection.
+                        Earn points and contribute towards a cleaner city.
+                    </p>
+
+                    <button class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle"></i>
+                        Report New Issue
+                    </button>
+                </div>
+
+                <div class="col-lg-5 text-center">
+                    <img
+                        src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png"
+                        class="hero-image img-fluid"
+                        alt="Civic Tracker"
+                    />
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="container my-5">
+        <div class="row g-4">
+
+            <div class="col-md-3">
+                <div class="card dashboard-card shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-exclamation-triangle-fill icon-red"></i>
+                        <h5>Issues Reported</h5>
+                        <h2>128</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card dashboard-card shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-check-circle-fill icon-green"></i>
+                        <h5>Resolved Issues</h5>
+                        <h2>97</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card dashboard-card shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-star-fill icon-yellow"></i>
+                        <h5>Reward Points</h5>
+                        <h2>2450</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card dashboard-card shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-trophy-fill icon-blue"></i>
+                        <h5>Leaderboard Rank</h5>
+                        <h2>#5</h2>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- GAMIFICATION SECTION -->
+    <section class="container my-5">
+
+        <div class="section-title">
+            <h2>Gamification & Achievements</h2>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <div class="achievement-card">
+                    <i class="bi bi-award-fill"></i>
+                    <h4>Bronze Citizen</h4>
+                    <p>Completed 25 successful reports</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="achievement-card">
+                    <i class="bi bi-fire"></i>
+                    <h4>7 Day Streak</h4>
+                    <p>Daily active participation</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="achievement-card">
+                    <i class="bi bi-lightning-fill"></i>
+                    <h4>AI Contributor</h4>
+                    <p>Top issue detector of the month</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- LEADERBOARD -->
+    <section class="container my-5">
+
+        <div class="section-title">
+            <h2>Citizen Leaderboard</h2>
+        </div>
+
+        <div class="table-responsive shadow-sm">
+            <table class="table table-hover leaderboard-table">
+
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Citizen</th>
+                        <th>Issues Reported</th>
+                        <th>Points</th>
+                        <th>Badge</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>🥇 1</td>
+                        <td>Rahul Kumar</td>
+                        <td>54</td>
+                        <td>5400</td>
+                        <td><span class="badge bg-warning text-dark">Gold</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>🥈 2</td>
+                        <td>Anjali Sharma</td>
+                        <td>49</td>
+                        <td>4920</td>
+                        <td><span class="badge bg-secondary">Silver</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>🥉 3</td>
+                        <td>Vikram Rao</td>
+                        <td>42</td>
+                        <td>4380</td>
+                        <td><span class="badge bg-danger">Bronze</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td>Priya Nair</td>
+                        <td>39</td>
+                        <td>4020</td>
+                        <td><span class="badge bg-primary">Active</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td>You</td>
+                        <td>36</td>
+                        <td>3890</td>
+                        <td><span class="badge bg-success">Contributor</span></td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer-section">
+        <div class="container text-center">
+            <p>
+                © 2026 AI Civic Tracker | Smart Governance Portal
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
